@@ -23,15 +23,19 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useToast } from "@/components/ui/use-toast";
+import { register } from '@/utils/api'; // Import the API service
 import { useState } from "react";
 
 const formSchema = z
   .object({
-    firstname: z.string().min(1, {
+    first_name: z.string().min(1, {
       message: "First name is required.",
     }),
-    lastname: z.string().min(1, {
+    last_name: z.string().min(1, {
       message: "Last name is required.",
+    }),
+    username: z.string().min(1, {
+      message: "Username is required.",
     }),
     email: z.string().email({
       message: "Please enter a valid email address.",
@@ -40,9 +44,6 @@ const formSchema = z
       message: "Password must be at least 8 characters.",
     }),
     confirmPassword: z.string(),
-    username: z.string().min(1, {
-      message: "Username is required.",
-    }),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match.",
@@ -57,27 +58,40 @@ const RegisterPage = () => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      firstname: "",
-      lastname: "",
+      first_name: "",
+      last_name: "",
+      username: "",
       email: "",
       password: "",
       confirmPassword: "",
-      username: "",
+      
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
+    
+    try {
+       register(values);
       toast({
-        title: "Confirmation Email Sent",
-        description: "Please check your email to confirm your account.",
+        title: "Registration Successful",
+        // description: "Please check your email to confirm your account.",
       });
       form.reset();
-      console.log(values);
-    }, 2000);
-  }
+      // console.log(values);
+    } catch (error) {
+      toast({
+        title: "Registration Failed",
+        description: "An error occurred",
+        // description: error.response?.data?.message || "An error occurred.",
+        // status: "error",
+      });
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="w-full lg:grid grid-cols-2   h-screen">
       <div className="flex items-center justify-center py-12 h-full">
@@ -97,7 +111,7 @@ const RegisterPage = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
-                    name="firstname"
+                    name="first_name"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>First Name</FormLabel>
@@ -111,7 +125,7 @@ const RegisterPage = () => {
 
                   <FormField
                     control={form.control}
-                    name="lastname"
+                    name="last_name"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Last Name</FormLabel>
