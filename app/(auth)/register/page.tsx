@@ -23,7 +23,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useToast } from "@/components/ui/use-toast";
-import { register } from '@/utils/api'; // Import the API service
+import { register } from '@/utils/RegisterApi';
 import { useState } from "react";
 
 const formSchema = z
