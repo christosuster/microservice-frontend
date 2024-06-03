@@ -19,11 +19,13 @@ import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-// import { login } from '@/utils/api'; // Import the API service
 import { z } from "zod";
 import { useRouter } from "next/navigation";
 import { ReloadIcon } from "@radix-ui/react-icons";
 import { useState } from "react";
+import { useDispatch } from 'react-redux';
+import { login } from '@/utils/LoginApi';
+// import { toast } from "@/components/ui/use-toast";
 
 const formSchema = z.object({
   username: z.string().min(1, {
@@ -37,6 +39,7 @@ const formSchema = z.object({
 const LoginPage = () => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const dispatch = useDispatch();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -45,17 +48,24 @@ const LoginPage = () => {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setLoading(true);
-    setTimeout(() => {
+    try {
+      login(values, dispatch);
       setLoading(false);
       form.reset();
-      router.push("/login-verification");
-      console.log(values);
-    }, 2000);
-  }
+      // toast({
+      //   title: "Login Successful",
+      // });
+      // router.push("/home");
+    } catch (error) {
+      console.error(error);
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="w-full lg:grid grid-cols-2   h-screen">
+    <div className="w-full lg:grid grid-cols-2 h-screen">
       <div className="flex items-center justify-center py-12 h-full">
         <Card className="mx-auto max-w-sm lg:bg-transparent shadow-none border-none">
           <CardHeader>
