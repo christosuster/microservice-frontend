@@ -15,25 +15,25 @@ export const login = async (props, dispatch) => {
         "username": username,
         "password": password,
       }),
-    }).then(res => {
-        if (!res.ok) {
-          return res.json().then(err => { throw err; });
-        }
-        return res.json();
-        })
-        .then(data => {
-            dispatch(loginSuccess({ access: data.access, refresh: data.refresh }));
-            toast({
-                title: "Login Successful",
-              });
-            // console.log("Login successful:", data);
-        })
-        .catch(error => {
-            console.error("Login failed:", error);
-        });
-        
+    })
+    .then(res => {
+      if (!res.ok) {
+        return res.json().then(err => { throw err; });
+      }
+      return res.json();
+      })
+      .then(data => {
+          dispatch(loginSuccess({ access: data.access, refresh: data.refresh, isLoggedIn: data.isLoggedIn }));
+      })
+      .catch(error => {
+          console.error("Login failed:", error);
+          toast({
+            title: "Login Failed",
+            description:"Wrong Credential"
+          });
+      });
 
-    } catch (error) {
-    console.error('API failed:', error);
+    } catch (error) { 
+        console.error('API failed:', error);
   }
 };

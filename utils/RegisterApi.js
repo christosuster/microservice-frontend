@@ -2,7 +2,8 @@ export const register = (props) => {
   const { first_name, last_name, email, username, password, confirmPassword } = props;
   console.log("props ",props)
 
-  fetch('http://0.0.0.0:8000/api/register/', {
+  fetch('http://0.0.0.0:8000/api/register/',
+  {
     method: "POST",
     headers: {
       'Content-Type': 'application/json',
@@ -30,6 +31,4 @@ export const register = (props) => {
     console.error("Registration failed:", error);
   });
 };
-
-
  
