@@ -22,10 +22,11 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
 import { ReloadIcon } from "@radix-ui/react-icons";
-import { useState } from "react";
-import { useDispatch } from 'react-redux';
+import { useEffect,useState } from "react";
+import { useSelector,useDispatch } from 'react-redux';
 import { login } from '@/utils/LoginApi';
 // import { toast } from "@/components/ui/use-toast";
+
 
 const formSchema = z.object({
   username: z.string().min(1, {
@@ -37,6 +38,7 @@ const formSchema = z.object({
 });
 
 const LoginPage = () => {
+  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const dispatch = useDispatch();
@@ -48,21 +50,29 @@ const LoginPage = () => {
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
+
     setLoading(true);
     try {
-      login(values, dispatch);
+      login(values, dispatch)
+      // console.log("isLoggedIn ",isLoggedIn)
+      // if(isLoggedIn) router.push('/home');
       setLoading(false);
       form.reset();
       // toast({
       //   title: "Login Successful",
       // });
-      // router.push("/home");
+      // 
     } catch (error) {
       console.error(error);
       setLoading(false);
     }
   };
+  useEffect(() => {
+    if (isLoggedIn) {
+      router.push('/home');
+    }
+  }, [isLoggedIn, router]);
 
   return (
     <div className="w-full lg:grid grid-cols-2 h-screen">
